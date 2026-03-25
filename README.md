@@ -11,7 +11,7 @@ Add `recompile_buster` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:recompile_buster, "~> 0.1.0", only: :dev, runtime: false}
+    {:recompile_buster, "~> 0.1.0", only: [:dev, :test], runtime: false}
   ]
 end
 ```
