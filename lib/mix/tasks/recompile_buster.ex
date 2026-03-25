@@ -46,7 +46,12 @@ defmodule Mix.Tasks.RecompileBuster do
   def run(args) do
     {opts, _, _} =
       OptionParser.parse(args,
-        strict: [fail_above: :integer, limit: :integer, min_transitive_deps: :integer, explain: :string]
+        strict: [
+          fail_above: :integer,
+          limit: :integer,
+          min_transitive_deps: :integer,
+          explain: :string
+        ]
       )
 
     case Keyword.get(opts, :explain) do
@@ -132,7 +137,9 @@ defmodule Mix.Tasks.RecompileBuster do
   end
 
   defp print_recompile_section(short_name, recompile_files) do
-    Mix.shell().info("A) Files that recompile when #{short_name} changes (#{length(recompile_files)}):")
+    Mix.shell().info(
+      "A) Files that recompile when #{short_name} changes (#{length(recompile_files)}):"
+    )
 
     Enum.each(recompile_files, fn dep ->
       Mix.shell().info("  #{dep}")
@@ -146,7 +153,9 @@ defmodule Mix.Tasks.RecompileBuster do
   end
 
   defp print_direct_deps_section(short_name, direct_deps, transitive_deps, forward_full_graph) do
-    Mix.shell().info("B) Direct dependencies of #{short_name} (#{transitive_deps} unique transitive deps):")
+    Mix.shell().info(
+      "B) Direct dependencies of #{short_name} (#{transitive_deps} unique transitive deps):"
+    )
 
     direct_deps
     |> Enum.map(fn {dep, _label} ->
@@ -174,7 +183,9 @@ defmodule Mix.Tasks.RecompileBuster do
   defp print_recommendation(file, transitive_deps) do
     Mix.shell().info("")
 
-    Mix.shell().info("Every file in (A) will recompile if any of the #{transitive_deps} files in (B) changes.")
+    Mix.shell().info(
+      "Every file in (A) will recompile if any of the #{transitive_deps} files in (B) changes."
+    )
 
     Mix.shell().info(
       "To fix this, break the compile dependency (A) or reduce the transitive deps (B) by removing direct dependencies with the most nested deps."
@@ -195,7 +206,11 @@ defmodule Mix.Tasks.RecompileBuster do
 
   @doc false
   def load_xref_graph(opts \\ []) do
-    tmp_path = Path.join(System.tmp_dir!(), "recompile_buster_xref_#{System.unique_integer([:positive])}.json")
+    tmp_path =
+      Path.join(
+        System.tmp_dir!(),
+        "recompile_buster_xref_#{System.unique_integer([:positive])}.json"
+      )
 
     xref_args = ["graph", "--format", "json", "--output", tmp_path]
 
@@ -299,15 +314,19 @@ defmodule Mix.Tasks.RecompileBuster do
 
   defp print_report(file_stats, limit) do
     sorted =
-      Enum.sort_by(file_stats, fn {_file, _recompiles, transitive_deps} -> transitive_deps end, :desc)
+      Enum.sort_by(
+        file_stats,
+        fn {_file, _recompiles, transitive_deps} -> transitive_deps end,
+        :desc
+      )
 
     Mix.shell().info("""
 
     Files causing excessive recompilation (sorted by transitive deps, 3 levels):
     """)
 
-    header = " #  | Transitive deps | Recompiles | File"
-    separator = "----+-----------+------------+---------------------------------------------"
+    header = "  # | Trans. deps | Recompiles | File"
+    separator = "----+-------------+------------+---------------------------------------------"
     Mix.shell().info(header)
     Mix.shell().info(separator)
 
@@ -318,7 +337,7 @@ defmodule Mix.Tasks.RecompileBuster do
       Mix.shell().info(
         String.pad_leading(Integer.to_string(index), 3) <>
           " | " <>
-          String.pad_leading(Integer.to_string(transitive_deps), 9) <>
+          String.pad_leading(Integer.to_string(transitive_deps), 11) <>
           " | " <>
           String.pad_leading(Integer.to_string(recompiles), 10) <>
           " | " <>
@@ -327,7 +346,9 @@ defmodule Mix.Tasks.RecompileBuster do
     end)
 
     total_transitive_deps =
-      Enum.reduce(file_stats, 0, fn {_file, _recompiles, transitive_deps}, acc -> acc + transitive_deps end)
+      Enum.reduce(file_stats, 0, fn {_file, _recompiles, transitive_deps}, acc ->
+        acc + transitive_deps
+      end)
 
     top_file =
       case sorted do
@@ -336,7 +357,10 @@ defmodule Mix.Tasks.RecompileBuster do
       end
 
     Mix.shell().info("")
-    Mix.shell().info("Problematic files: #{length(sorted)} | Total transitive deps: #{total_transitive_deps}")
+
+    Mix.shell().info(
+      "Problematic files: #{length(sorted)} | Total transitive deps: #{total_transitive_deps}"
+    )
 
     if top_file do
       Mix.shell().info("")
